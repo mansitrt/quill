@@ -62,55 +62,54 @@ const selection =() => {
      return window.getSelection();
 }
 
-// document.addEventListener("DOMContentLoaded", function() {
-//     const fontSelect = document.getElementById("fontSelect");
+document.addEventListener("DOMContentLoaded", function() {
+    const fontSelect = document.getElementById("fontSelect");
     
-//     console.log('fontSelect :>> ', fontSelect);
+    console.log('fontSelect :>> ', fontSelect);
   
-//     if (fontSelect) {
-//       // Listen for clicks on the main dropdown
-//       fontSelect.addEventListener("click", function(event) {
-//         window.webkit.messageHandlers.callbackHandler.postMessage(`Toolbar_Visible`);
-//                     if(isTabToEdit) {
-//                         document.getElementById('toolbar').style.display = 'block';
-//                     }
+    if (fontSelect) {
+      // Listen for clicks on the main dropdown
+      fontSelect.addEventListener("click", function(event) {
+        window.webkit.messageHandlers.callbackHandler.postMessage(`Toolbar_Visible`);
+                    if(isTabToEdit) {
+                        document.getElementById('toolbar').style.display = 'block';
+                    }
                    
-//                     toolbar.scrollIntoView();
-//                     setTimeout(() => {
-//                         if(document.getElementById('toolbar').style.display != 'none') {
-//                             document.getElementById('editor').style.height = `${editorHeight + Number(belowContentHeight) - Number(keyboardHeight)}px`;
-//                         }
-//                         quill.focus();
-//                         toolbar.scrollIntoView();
-//                     }, 100)
-//       });
-//     }
-//   });
-  snow.on('selection-change', function (range) {
-    if (range) {
-        if (range.start == range.end) {
-            window.webkit.messageHandlers.callbackHandler.postMessage(`Toolbar_Visible`);
-            
-            if(isTabToEdit) {
-                document.getElementById('toolbar').style.display = 'block';
-            }
-           
-           //document.getElementById('editor').style.height = '36%';
-            toolbar.scrollIntoView();
-            setTimeout(() => {
-                if(document.getElementById('toolbar').style.display != 'none') {
-                    document.getElementById('editor').style.height = `${editorHeight + Number(belowContentHeight) - Number(keyboardHeight)}px`;
-                }
-                snow.focus();
-                toolbar.scrollIntoView();
-            }, 100)
-            
-        }
-    } else {
-        document.getElementById('editor').style='';
-        toolbar.scrollIntoView();
+                    toolbar.scrollIntoView();
+                    setTimeout(() => {
+                        if(document.getElementById('toolbar').style.display != 'none') {
+                            document.getElementById('editor').style.height = `${editorHeight + Number(belowContentHeight) - Number(keyboardHeight)}px`;
+                        }
+                        quill.focus();
+                        toolbar.scrollIntoView();
+                    }, 100)
+      });
     }
-})
+  });
+// quill.on('selection-change', function (range) {
+//     if (range) {
+//         if (range.start == range.end) {
+//             window.webkit.messageHandlers.callbackHandler.postMessage(`Toolbar_Visible`);
+            
+//             if(isTabToEdit) {
+//                 document.getElementById('toolbar').style.display = 'block';
+//             }
+           
+//             toolbar.scrollIntoView();
+//             setTimeout(() => {
+//                 if(document.getElementById('toolbar').style.display != 'none') {
+//                     document.getElementById('editor').style.height = `${editorHeight + Number(belowContentHeight) - Number(keyboardHeight)}px`;
+//                 }
+//                 quill.focus();
+//                 toolbar.scrollIntoView();
+//             }, 100)
+            
+//         }
+//     } else {
+//         document.getElementById('editor').style='';
+//         toolbar.scrollIntoView();
+//     }
+// })
 
 // Return the HTML content of the editor
 function getQuillHtml() { return quill.root.innerHTML; }
