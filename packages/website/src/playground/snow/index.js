@@ -36,7 +36,7 @@ const quill = new Quill('#editor', {
                tableUI: true,
       toolbar: '#toolbar'
   },
-  placeholder: 'Compose an epic...',
+  placeholder: `${placeHolderLanguage}`,
   theme: 'snow', // or 'bubble'
 });
 
@@ -61,28 +61,28 @@ const selection =() => {
     if (window.getSelection)
      return window.getSelection();
 }
-quill.on('selection-change', function (range) {
-  console.log('range :>> ', range);
-    if (range) {
-        if (range.start == range.end) {
-            window.webkit.messageHandlers.callbackHandler.postMessage(`Toolbar_Visible`);
+// quill.on('selection-change', function (range) {
+//   console.log('range :>> ', range);
+//     if (range) {
+//         if (range.start == range.end) {
+//             window.webkit.messageHandlers.callbackHandler.postMessage(`Toolbar_Visible`);
             
-            if(isTabToEdit) {
-                document.getElementById('toolbar').style.display = 'block';
-            }
+//             if(isTabToEdit) {
+//                 document.getElementById('toolbar').style.display = 'block';
+//             }
            
-            toolbar.scrollIntoView();
-            setTimeout(() => {
-                if(document.getElementById('toolbar').style.display != 'none') {
-                    document.getElementById('editor').style.height = `${editorHeight + Number(belowContentHeight) - Number(keyboardHeight)}px`;
-                }
-                // quill.focus();
-                toolbar.scrollIntoView();
-            }, 100)
+//             toolbar.scrollIntoView();
+//             setTimeout(() => {
+//                 if(document.getElementById('toolbar').style.display != 'none') {
+//                     document.getElementById('editor').style.height = `${editorHeight + Number(belowContentHeight) - Number(keyboardHeight)}px`;
+//                 }
+//                 // quill.focus();
+//                 toolbar.scrollIntoView();
+//             }, 100)
             
-        }
-    }
-})
+//         }
+//     }
+// })
 
 // Return the HTML content of the editor
 function getQuillHtml() { return quill.root.innerHTML; }
