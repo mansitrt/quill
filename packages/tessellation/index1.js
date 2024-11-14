@@ -1,5 +1,5 @@
-import Quill from '../quill/dist';  // Import Quill
-import '../quill/dist/dist/quill.snow.css';  // Optional: Import the default Quill theme CSS
+// import Quill from '../quill/dist';  // Import Quill
+// import '../quill/dist/dist/quill.snow.css';  // Optional: Import the default Quill theme CSS
 const toolbarOptions = [
   ['bold', 'italic', 'underline', 'strike'], // toggled buttons
   ['blockquote', 'code-block'],
@@ -24,7 +24,7 @@ var isPlanNote = false;
 var belowContentHeight = 0;
 // Add fonts to whitelist
 let Font = Quill.import('formats/font');
-Font.whitelist = ['Times-New-Roman','Helvetica', 'Apple-Chancery','Papyrus','Rockwell','Optima', 'Georgia'];
+Font.whitelist = ['TimesNewRoman','Helvetica', 'AppleChancery','Papyrus','Rockwell','Optima', 'Georgia'];
 Quill.register(Font, true);
 
 var Size = Quill.import("attributors/style/size");
