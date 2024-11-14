@@ -2,7 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './index1.js',  // Your main JS file where you initialize Quill
+  entry: './index.js',  // Your main JS file where you initialize Quill
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
@@ -21,7 +21,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './index.html', // Your HTML file to be used as a template
+      template: './richTextMode.html', // Your HTML file to be used as a template
     }),
   ],
   mode: 'production',  // Use 'development' for dev mode
