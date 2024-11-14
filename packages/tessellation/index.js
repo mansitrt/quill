@@ -1,3 +1,7 @@
+import Quill from '../quill/dist';
+import '../quill/dist/dist/quill.snow.css';
+
+
 const toolbarOptions = [
   ['bold', 'italic', 'underline', 'strike'], // toggled buttons
   ['blockquote', 'code-block'],
