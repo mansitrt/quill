@@ -1,117 +1,359 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0">
-    <title>Quill Editor Example</title>
-    <link href="./quill.core.css" rel="stylesheet" />
-    <!-- <link href="./quill.min.css" rel="stylesheet" /> -->
-    <!-- <link href="./quill-table.min.css" rel="stylesheet" /> -->
-    <link href="./quill.snow.css" rel="stylesheet" />
-  </head>
-  <style>
+<!-- Style -->
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+<style>
+    #toolbar{
+        position: sticky; /* Keep it fixed at the top */
+         top: 0px;
+         z-index: 10;
+         background-color: white; /* Match toolbar background */
+         border-bottom: 1px solid #ccc; /* Optional for a nice separation */
+    }
+    #editor-container{
+        overflow-y: hidden !important;
+    }
+    .ql-container {
+       border: 1px solid transparent !important;
+       overflow-y: visible !important;
+    }
+    .ql-container.ql-snow{
+        border: 1px solid transparent !important;
+        overflow-y: visible !important;
+    }
+  
     .ql-editor.ql-blank:focus::before {
       content: '';
     }
-
-      .ql-font-Helvetica {
-    font-family: "Helvetica";
-  }
-  .ql-font-AppleChancery {
-    font-family: "Apple-Chancery";
-  }
-  .ql-font-Papyrus {
-    font-family: "Papyrus";
-  }
-  .ql-font-Rockwell {
-    font-family: "Rockwell";
-   }
-   .ql-font-Optima {
-    font-family: "Optima";
-   }
-   .ql-font-Georgia {
-    font-family: "Georgia";
-   }
-    .ql-font-TimesNewRoman {
-     font-family: "Times-New-Roman";
+      /* Set content font-families */
+    .ql-font-Helvetica {
+      font-family: "Helvetica";
     }
-  </style>
-  <body>
+    .ql-font-AppleChancery {
+      font-family: "Apple-Chancery";
+    }
+    .ql-font-Papyrus {
+      font-family: "Papyrus";
+    }
+    .ql-font-Rockwell {
+      font-family: "Rockwell";
+    }
+    .ql-font-Optima {
+      font-family: "Optima";
+    }
+    .ql-font-Georgia {
+      font-family: "Georgia";
+    }
+    .ql-font-TimesNewRoman {
+      font-family: "Times-New-Roman";
+    }
+  /* We do not set Sans Serif since it is the default font */
+</style>
 
-    <div id="toolbarWrapper">
-      <div id="toolbar">
-        <span class="ql-formats">
-          <button class="ql-bold"></button>
-          <button class="ql-italic"></button>
-          <button class="ql-underline"></button>
-          <button class="ql-strike"></button>
-        </span>
-        <span class="ql-format-seperator"></span>
-        <span class="ql-formats">
-          <button class="ql-list" value="ordered"></button>
-          <button class="ql-list" value="bullet"></button>
-          <select class="ql-align">
-            <option label="left" selected></option>
-            <option label="center" value="center"></option>
-            <option label="right" value="right"></option>
-            <option label="justify" value="justify"></option>
-          </select>
-        </span>
-        <span class="ql-format-seperator" style="margin-left:-4px;"></span>
-        <span class="ql-formats">
-          <select class="ql-color"></select>
-          <select class="ql-background"></select>
-        </span>
-        <span class="ql-formats">
-          <select class="ql-font" id="fontSelect">
-            <option value="Helvetica">Helvetica</option>
-            <option value="TimesNewRoman">Times New Roman</option>
-            <option value="AppleChancery">Apple Chancery</option>
-            <option value="Papyrus">Papyrus</option>
-            <option value="Rockwell">Rockwell</option>
-            <option value="Optima">Optima</option>
-            <option value="Georgia">Georgia</option>
-          </select>
-        </span>
-        <span class="ql-format-seperator"></span>
-        <span class="ql-formats">
-          <select class="ql-size" id="sizeSelect">
-            <option value="10px">10px</option>
-            <option value="11px">11px</option>
-            <option value="12px">12px</option>
-            <option value="14px">14px</option>
-            <option value="16px">16px</option>
-            <option value="18px">18px</option>
-            <option value="20px">20px</option>
-            <option value="24px">24px</option>
-            <option value="28px">28px</option>
-            <option value="36px" id="fontSize36">36px</option>
-          </select>
-          <button id="insert-table">
-            <?xml version="1.0"
-            encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-            <svg width="auto" height="auto" viewBox="0 0 24 24" fill="none"
-              xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M4 12L20 12M12 4L12 20M6.2 20H17.8C18.9201 20 19.4802 20 19.908 19.782C20.2843 19.5903 20.5903 19.2843 20.782 18.908C21 18.4802 21 17.9201 21 16.8V7.2C21 6.0799 21 5.51984 20.782 5.09202C20.5903 4.71569 20.2843 4.40973 19.908 4.21799C19.4802 4 18.9201 4 17.8 4H6.2C5.0799 4 4.51984 4 4.09202 4.21799C3.71569 4.40973 3.40973 4.71569 3.21799 5.09202C3 5.51984 3 6.07989 3 7.2V16.8C3 17.9201 3 18.4802 3.21799 18.908C3.40973 19.2843 3.71569 19.5903 4.09202 19.782C4.51984 20 5.07989 20 6.2 20Z"
-                stroke="#000000" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" />
-            </svg>
-          </button>
-        </span>
+<!-- Include Quill stylesheet -->
+<link href="quill.snow.css" rel="stylesheet" />
+<link href="quill.min.css" rel="stylesheet" />
+<link href="quill-table.min.css" rel="stylesheet" />
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0">
+<script src="quill.js"></script>
+<script src="jquery-s.1.4.min.js"></script>
+<script src="quill-table.min.js"></script>
 
+<!-- Create the toolbar container -->
+
+<!-- Create the editor container -->
+<div id="editor-container" class="editor-container">
+  <div id="toolbar">
+    <span class="ql-formats">
+      <select class="ql-font" id="fontSelect">
+        <option value="Helvetica">Helvetica</option>
+        <option value="TimesNewRoman">Times New Roman</option>
+        <option value="AppleChancery">Apple Chancery</option>
+        <option value="Papyrus">Papyrus</option>
+        <option value="Rockwell">Rockwell</option>
+        <option value="Optima">Optima</option>
+        <option value="Georgia">Georgia</option>
+      </select>
+    </span>
+    <span class="ql-format-seperator"></span>
+    <span class="ql-formats">
+      <select class="ql-size" id="sizeSelect">
+        <option value="10px">10px</option>
+        <option value="11px">11px</option>
+        <option value="12px">12px</option>
+        <option value="14px">14px</option>
+        <option value="16px">16px</option>
+        <option value="18px">18px</option>
+        <option value="20px">20px</option>
+        <option value="24px">24px</option>
+        <option value="28px">28px</option>
+        <option value="36px" id="fontSize36">36px</option>
+      </select>
+      <button id="insert-table">
+        <?xml version="1.0"
+        encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+        <svg width="auto" height="auto" viewBox="0 0 24 24" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M4 12L20 12M12 4L12 20M6.2 20H17.8C18.9201 20 19.4802 20 19.908 19.782C20.2843 19.5903 20.5903 19.2843 20.782 18.908C21 18.4802 21 17.9201 21 16.8V7.2C21 6.0799 21 5.51984 20.782 5.09202C20.5903 4.71569 20.2843 4.40973 19.908 4.21799C19.4802 4 18.9201 4 17.8 4H6.2C5.0799 4 4.51984 4 4.09202 4.21799C3.71569 4.40973 3.40973 4.71569 3.21799 5.09202C3 5.51984 3 6.07989 3 7.2V16.8C3 17.9201 3 18.4802 3.21799 18.908C3.40973 19.2843 3.71569 19.5903 4.09202 19.782C4.51984 20 5.07989 20 6.2 20Z"
+            stroke="#000000" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </button>
+    </span>
+    <span class="ql-formats">
+      <button class="ql-bold"></button>
+      <button class="ql-italic"></button>
+      <button class="ql-underline"></button>
+      <button class="ql-strike"></button>
+    </span>
+    <span class="ql-format-seperator" style="margin-left:-4px;"></span>
+    <span class="ql-formats">
+      <select class="ql-color"></select>
+      <select class="ql-background"></select>
+    </span>
+    <span class="ql-format-seperator"></span>
+    <span class="ql-formats">
+      <button class="ql-list" value="ordered"></button>
+      <button class="ql-list" value="bullet"></button>
+      <select class="ql-align">
+        <option label="left" selected></option>
+        <option label="center" value="center"></option>
+        <option label="right" value="right"></option>
+        <option label="justify" value="justify"></option>
+      </select>
+    </span>
+  </div>
+  <div id="editor">
+    <p><span id="firstElement" class><span></p>
       </div>
     </div>
-    <div id="editor-container">
-      <div id="editor">
-        <p><span id="firstElement" class><span></p>
-      </div>
-    </div>
-    <script defer src="./jquery-s.1.4.min.js"></script>
 
-    <script type="module" src="./quill.js"></script>
-    <!-- <script src="./quill.min.js"></script> -->
-    <!-- <script src="./quill-table.min.js"></script>  -->
-    <script type="module" src="./index.js"></script>
-  </body>
-</html>
+    <script>
+       var  placeHolderLanguage = 'Enter note content here';
+       var  keyboardHeight = 0;
+       var isTabToEdit = null;
+       var isPlanNote = false;
+       var belowContentHeight = 0;
+       // Add fonts to whitelist
+       let Font = Quill.import('formats/font');
+       // We do not add Sans Serif since it is the default
+       Font.whitelist = ['TimesNewRoman','Helvetica', 'AppleChancery','Papyrus','Rockwell','Optima', 'Georgia'];
+       Quill.register(Font, true);
+       
+       var Size = Quill.import("attributors/style/size");
+       Size.whitelist = ['10px','11px', '12px', '14px', '16px', '18px', '20px', '24px','28px','36px'];
+       Quill.register(Size, true);
+       
+       Quill.register({
+           'modules/tableUI': quillTableUI.default
+       }, true)
+
+       var snow = new Quill('#editor', {
+           theme: 'snow',
+           placeholder: `${placeHolderLanguage}`,
+           modules: {
+               table: true,
+               tableUI: true,
+               toolbar:'#toolbar'
+           }
+       });
+       
+       
+       
+       const editorContainer = document.getElementById('editor-container');
+       const editor = document.getElementById('editor');
+
+       // Called each time when text changes in the editor
+       const toolbar = document.getElementById("toolbar");
+       const toolbarWrapper = document.getElementById("toolbarWrapper");
+
+
+       document.querySelector('#insert-table').addEventListener('click', function () {
+           table.insertTable(2, 2);
+       });
+       
+       snow.on('text-change', function (delta, source) {
+                 sendContentToNativeApp();
+       })
+       
+
+       let editorHeight = document.getElementById('editor').offsetHeight;
+       const selection =() => {
+           if (window.getSelection)
+            return window.getSelection();
+       }
+       
+       snow.on('selection-change', function (range) {
+                  if (range) {
+                      if (range.start == range.end) {
+                          window.webkit.messageHandlers.callbackHandler.postMessage(`Toolbar_Visible`);
+                          
+                          if(isTabToEdit) {
+                              document.getElementById('toolbar').style.display = 'block';
+                          }
+                         
+                         //document.getElementById('editor').style.height = '36%';
+                          toolbar.scrollIntoView();
+                          setTimeout(() => {
+                              if(document.getElementById('toolbar').style.display != 'none') {
+                                  document.getElementById('editor').style.height = `${editorHeight + Number(belowContentHeight) - Number(keyboardHeight)}px`;
+                              }
+                              snow.focus();
+                              toolbar.scrollIntoView();
+                          }, 100)
+                          
+                      }
+                  } else {
+                      document.getElementById('editor').style='';
+                      toolbar.scrollIntoView();
+                  }
+              })
+       // Return the HTML content of the editor
+       function getQuillHtml() { return snow.root.innerHTML; }
+
+       // Send editor text to native app
+       function sendContentToNativeApp() {
+           try {
+               let html = getQuillHtml();
+               window.webkit.messageHandlers.callbackHandler.postMessage(html);
+           } catch (err) {
+               console.log('The native context does not exist yet');
+           }
+       }
+
+       function adjustForKeyboard(keyboardHeight) {
+        const toolbar = document.getElementById('toolbar');
+         const editor = document.getElementById('editor');
+         editor.style.paddingTop = '20px';
+         const editorContainer = document.getElementById('editor-container');
+         const toolbarHeight = toolbar ? toolbar.offsetHeight : 0;
+         window.webkit.messageHandlers.callbackHandler.postMessage(window.innerHeight.toString());
+         window.webkit.messageHandlers.callbackHandler.postMessage(editor.style.height.toString());
+         editorContainer.style.border = '1px solid #ccc';
+         editorContainer.style.height = 'calc(100vh - 40px)';
+         if (keyboardHeight > 0) {
+             const availableHeight = (window.innerHeight - keyboardHeight - toolbarHeight)+ 144;
+             const containerHeight = (window.innerHeight - keyboardHeight) + 144;
+             editorContainer.style.border = '1px solid #ccc';
+             editorContainer.style.height = `${containerHeight}px`;
+             editor.style.height= `${availableHeight}px`;
+         } else {
+            // Reset height when the keyboard is closed
+            const availableHeight = (window.innerHeight - keyboardHeight - toolbarHeight)+ 96;
+            editorContainer.style.border = '1px solid #ccc';
+            editor.style.height= `${availableHeight}px`;
+            editorContainer.style.height = 'calc(100vh - 40px)';
+     
+         }
+       }
+
+       // Initial setup when the page loads
+       document.addEventListener('DOMContentLoaded', () => {
+           editorContainer.style.border = '1px solid #ccc';
+           editorContainer.style.height = 'calc(100vh - 30px)';
+           editor.style.height= `${availableHeight}px`;
+      });
+       
+       function isToolbarFullyVisible() {
+                 var $toolbar = $('#toolbar');
+                 var toolbarTop = $toolbar.offset().top;
+                 var toolbarBottom = toolbarTop + $toolbar.outerHeight();
+                 var windowHeight = $(window).height();
+
+                 return toolbarTop >= 0 && toolbarBottom <= windowHeight;
+             }
+
+             $(window).on('resize', function () {
+                 if (isToolbarFullyVisible) {
+                     window.webkit.messageHandlers.callbackHandler.postMessage('Toolbar_Visible');
+                 } else {
+                     window.webkit.messageHandlers.callbackHandler.postMessage('Toolbar_Not_Visible');
+                 }
+             });
+
+		
+       $("#btnscrollToBottom").click(function () {
+           const $editable = $('.ql-editor');
+           const height = $editable[0].scrollHeight;
+
+           console.log('scroll height: ', height);
+
+           $editable.animate({
+               scrollTop: height
+           }, 500);
+       });
+
+       $("#MakeUIWorkForEdit").click(function () {
+           snow.root.scrollTop = 0;
+       });
+
+       function scrollToCursor() {
+           var range = snow.getSelection();
+           if (range) {
+               var bounds = snow.getBounds(range.index, range.length);
+               snow.root.scrollTop = bounds.top;
+           }
+       }
+
+       $("#ScrollToCursorPosition").click(function () {
+           scrollToCursor();
+       });
+       
+       function disabledRichTextContainer() {
+               snow.enable(false);
+               isTabToEdit = false;
+
+               document.getElementById('toolbar').style.display = 'none';
+               document.querySelector('#editor-container .ql-container.ql-snow').style.height = '100%';
+      
+           }
+        
+           
+           function enabledRichTextContainer() {
+               isPlanNote = false;
+               snow.enable(true);
+               document.getElementById('toolbar').style.display = 'none';
+               isTabToEdit = true;
+               document.querySelector('#editor-container .ql-container.ql-snow').style.height = '95%';
+           }
+       
+       	
+           
+           function getTextOfRichTextEditorEdit() {
+               window.webkit.messageHandlers.callbackHandler.postMessage('Start edit');
+               snow.enable(true);
+               const root = snow.root;
+               const selectionPosition = Math.round(root.scrollTop / (root.scrollHeight - root.clientHeight) * snow.getLength());
+               snow.setSelection(selectionPosition || 0);
+               document.getElementById('toolbar').style.display = 'block';
+
+               	
+               setTimeout(() => {
+                   if(document.getElementById('toolbar').style.display != 'none') {
+                       document.getElementById('editor').style.height = `${editorHeight + Number(belowContentHeight) - Number(keyboardHeight)}px`;
+                   }
+                   snow.focus();
+                   toolbar.scrollIntoView();
+               }, 100)
+           }
+       
+            function adjustEditorHeight() {
+                document.getElementById('toolbar').style.position = 'sticky';               // Calculate the available height when the keyboard is visible or not
+               const availableHeight = window.innerHeight;
+               const toolbarHeight = toolbar.offsetHeight;
+               document.getElementById('editor').style.height = `${availableHeight - toolbarHeight}px`;
+            }
+       
+ 
+        async function setkeyboardScroll() {
+            const range = snow.getSelection();
+            await snow.blur();
+            await snow.setSelection(range.index, range.length);
+            await toolbar.scrollIntoView();
+        }
+
+
+       function changeThePlaceHolder(newPlaceholder) {
+           snow.root.setAttribute('data-placeholder', `${newPlaceholder}`);
+       }
+       
+   </script>
