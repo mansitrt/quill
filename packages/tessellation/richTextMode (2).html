@@ -1,56 +1,35 @@
 <!-- Style -->
 <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 <style>
-
-    html{
-      overflow: hidden;
-      margin: 0;
-      height: 100%;
-    }
-    body{
-        border: 1px solid red;
-        background-color: yellow;
-        overflow: hidden;
-        margin: 0;
-    }
-
-    input, textarea {
-    position: fixed; /* Keeps inputs in place when keyboard appears */
-}
-    
-    #toolbar {
+  #toolbar {
     padding: 10px;
-    background-color: green;
-    border-bottom: 1px solid green;
+    background-color: white;
+    border-bottom: 1px solid #ccc;
   }
 
   #editor {
-    border: 1px solid red;
+    border: 1px solid #ccc;
     overflow-y: auto;
-    background-color: #f800ff;
-    height: calc(100vh - 180px);
-    flex-grow: 1;
+    height: calc(100vh - 100px);
+    padding-bottom: 10px;
   }
 
   /*  overflow: auto;*/
   #editor-container {
     display: flex;
     flex-direction: column;
-    border: 1px solid blue !important;
-    background-color: blue;
-    padding: 0;
+    border: 1px solid #ccc;
     position: relative;
-    /* height: calc(100vh - 130px); */
     overflow: hidden;
-    box-sizing: border-box;
-    
   }
 
   .ql-container {
+    border: 1px solid transparent !important;
     overflow-y: visible !important;
   }
 
   .ql-container.ql-snow {
+    border: 1px solid transparent !important;
     overflow-y: visible !important;
 
   }
@@ -93,14 +72,14 @@
 
 <!-- Include Quill stylesheet -->
 <!--  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet" />-->
-<link href="quill.snow.css" rel="stylesheet" />
-<link href="quill.min.css" rel="stylesheet" />
-<link href="quill-table.min.css" rel="stylesheet" />
+<link href="./quill.snow.css" rel="stylesheet" />
+<link href="./quill.min.css" rel="stylesheet" />
+<link href="./quill-table.min.css" rel="stylesheet" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<script src="quill.js"></script>
-<script src="jquery-s.1.4.min.js"></script>
+<script src="./quill.js"></script>
+<script src="./jquery-s.1.4.min.js"></script>
 <!-- <script src="quill.min.js"></script> -->
-<script src="quill-table.min.js"></script>
+<script src="./quill-table.min.js"></script>
 
 <!-- Create the toolbar container -->
 
@@ -246,11 +225,9 @@
       modules: {
         table: true,
         tableUI: true,
-        toolbar: '#toolbar',
-      },
+        toolbar: '#toolbar'
+      }
     });
-
-
 
     const table = snow.getModule('table');
     const editorContainer = document.getElementById('editor-container');
@@ -261,7 +238,7 @@
       .addEventListener('click', function () {
         table.insertTable(2, 2);
       });
-    
+
     // Called each time when text changes in the editor
     const toolbar = document.getElementById('toolbar');
     const toolbarWrapper = document.getElementById('toolbarWrapper');
@@ -272,56 +249,51 @@
     };
 
     snow.on('selection-change', function (range) {
-       if (range) {
-               if (range.start == range.end) {
-                   window.webkit.messageHandlers.callbackHandler.postMessage(`Toolbar_Visible`);
-                   
-                   
-                   if(isTabToEdit) {
-                       document.getElementById('toolbar').style.display = 'block';
-                   }
-                  
+      if (range) {
+        if (range.start == range.end) {
+          window.webkit.messageHandlers.callbackHandler.postMessage(
+            `Toolbar_Visible`,
+          );
 
-                    setTimeout(() => window.scrollTo(0,0), 450)
-                   setupScrollToClickedPart();
-               }
-           } else {
-               //document.getElementById('editor').style='';
-               //toolbar.scrollIntoView();
-           }
+          if (isTabToEdit) {
+            document.getElementById('toolbar').style.display = 'block';
+          }
+        }
+      }
     });
-
-
-function setupScrollToClickedPart() {
-    const editor = document.getElementById('editor');
     
-    if (!editor) {
-        console.error("Element with id 'editor' not found.");
-        return;
-    }
-
-    editor.addEventListener('click', (event) => {
-        const rect = editor.getBoundingClientRect();
-        const clickY = event.clientY - rect.top; // Y position of the click inside the editor
-        const editorHeight = rect.height;
-        const toolbar = getElementById("toolbar");
-        // Calculate the scroll target based on the click position
-        const scrollTarget = (clickY / editorHeight) * editor.scrollHeight - toolbar.offsetHeight;
-
-        window.webkit.messageHandlers.callbackHandler.postMessage(scrollTarget.toString());
-
-        // Scroll to the target position
-        editor.scrollTo({
-            top: scrollTarget,
-            behavior: 'smooth'
-        });
-
-
-         editor.scrollIntoView({ behavior: 'smooth' });
+    document.addEventListener('scroll', (event) => {
+      window.scrollTo(0, 0);
     });
-}
+    
+    function setupClickToScroll() {
+        const parentDiv = document.getElementById('editor');
 
+        if (!parentDiv) {
+            console.error(`Div with id "${divId}" not found.`);
+            return;
+        }
 
+        parentDiv.addEventListener('click', (event) => {
+            // Check if the clicked element is a child of the parent div
+            if (parentDiv.contains(event.target)) {
+                const clickedElement = event.target;
+
+                // If the clicked target is not the parent div itself
+                if (clickedElement !== parentDiv) {
+                    // Set a timeout to scroll the clicked element into view after 3 seconds
+                    setTimeout(() => {
+                        clickedElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center', // Center the element in the view
+                        });
+                    }, 300); // 3 seconds delay
+                }
+            }
+        });
+    }
+    setupClickToScroll();
+    
   
     snow.on('text-change', function (delta, source) {
       sendContentToNativeApp();
@@ -338,76 +310,8 @@ function setupScrollToClickedPart() {
       }
     }
     
-    function adjustForKeyboard(keyboardHeight, whoAmI) {
-
-        const toolbar = document.getElementById('toolbar'); //70
-        const editor = document.getElementById('editor');
-        const editorContainer = document.getElementById('editor-container'); //100%
-        const toolbarHeight = toolbar.offsetHeight; //70
-        const editorContainerHeight = editorContainer.offsetHeight;
-
-        // If keyboard is open, adjust the height of the editor
-        if (keyboardHeight > 0) { //Keyboard: 380
-            editor.style.height = "150px";
-            // document.addEventListener('focus', (event) => {
-            //   document.body.style.overflow = "hidden";
-            //   event.preventDefault();
-            // })
-        } else {
-            editor.style.height = '340px';
-        }
-            
-    }
-
-function adjustEditorHeight() {
-    const toolbar = document.getElementById('toolbar');
-    const editor = document.getElementById('editor');
-
-    if (toolbar && editor) {
-        const toolbarHeight = toolbar.offsetHeight;
-        const newEditorHeight = `calc(100vh - 50px - ${toolbarHeight}px)`;
-        editor.style.height = newEditorHeight;
-    }
-}
-
-// Call the function initially to set the height
-adjustEditorHeight();
-
-// Add the resize event listener
-window.addEventListener('resize', adjustEditorHeight);
-
-
-$('#editor').focus((e) => {
-  e.preventDefault();
-  e.target.focus({preventScroll: false});
-})
-
-
-
-// function detectScroll() {
-//     window.addEventListener('scroll', (event) => {
-   
-
-
-//       window.webkit.messageHandlers.callbackHandler.postMessage("page y offset ");
-//         window.webkit.messageHandlers.callbackHandler.postMessage(window.pageYOffset.toString());
-//         window.webkit.messageHandlers.callbackHandler.postMessage(window.pageXOffset.toString());
-
-//                 event.preventDefault();
-//                 event.target.scroll({preventScroll : true})
-
-//     });
-// }
-
-// // Call the function to start detecting scroll
-// detectScroll();
-
-
-// Call the function initially to set the height
-
-// Add the resize event listener
     
-    function adjustForKeyboardV1(keyboardHeight) {
+    function adjustForKeyboard(keyboardHeight) {
         const toolbar = document.getElementById('toolbar');
         const editor = document.getElementById('editor');
         const editorContainer = document.getElementById('editor-container');
@@ -416,71 +320,10 @@ $('#editor').focus((e) => {
 
         // If keyboard is open, adjust the height of the editor
         if (keyboardHeight > 0) {
-            let availableHeight = window.innerHeight - keyboardHeight - toolbarHeight;
-            window.webkit.messageHandlers.callbackHandler.postMessage("availableHeight")
-            window.webkit.messageHandlers.callbackHandler.postMessage(JSON.stringify(availableHeight))
-
-            // Set the editor height to a smaller value (adjust to your needs)
-            editor.style.height = `${availableHeight * 0.7}vh`; // This makes the editor take 70% of the available space
-            editorContainer.style.overflowY = 'hidden';
-            editorContainer.style.maxHeight = `46vh`; // Make sure container also adjusts
-            editor.style.overflowY = 'auto'; // Ensure scrolling if content exceeds the height
-            document.body.style.height = `${window.innerHeight}px`; // Adjust body height for consistency
+            editor.style.height = "180px";
         } else {
-            let heightForEditor = editorContainerHeight - toolbarHeight;
-            
-            window.webkit.messageHandlers.callbackHandler.postMessage("heightForEditor")
-            window.webkit.messageHandlers.callbackHandler.postMessage(JSON.stringify(heightForEditor))
-            // Reset height when keyboard is closed
-            editor.style.height = '70vh'; // Set to 70% of the viewport height
-            editorContainer.style.maxHeight = `90vh`; // Keep container consistent
-            document.body.style.height = '100vh'; // Reset body height to default
-            editor.style.overflowY = 'auto'; // Ensure scrolling if content exceeds the height
+            editor.style.height = `calc(100vh - 100px)`;
         }
-    }
-
-    
-  function adjustForKeyboardOld(keyboardHeight) {
-      //this is working currently rightßß
-    const toolbar = document.getElementById('toolbar');
-    const editor = document.getElementById('editor');
-    const editorContainer = document.getElementById('editor-container');
-    const toolbarHeight = toolbar.offsetHeight;
-
-    
-    
-    
-    // if keyboard is open
-    if (keyboardHeight > 0) {
-        
-     //   editor.addEventListener('focus', (event) => {
-     //       event.preventDefault(); // Prevent default scrolling behavior
-     //   });
-     //   snow.root.scrollTop = 0;
-       
-       let qlContainer = document.getElementsByClassName('ql-snow');
-       document.querySelector('#editor-container .ql-container.ql-snow').style.height = '30vh';
-       document.querySelector('#editor-container .ql-container.ql-snow').style.backgroundColor = 'red';
-      editor.style.height = '40vh';
-      
-      document.body.style.height = '40vh';
-      window.scrollTo(0,0);
-      
-    } else {
-      // Reset height when the keyboard is closed
-   //   editor.style.height = '80vh';
-      editor.style.height = '70vh';
-      document.body.style.height = '70vh';
-    }
-  }
-    
-    function adjustForKeyboard2(keyboardHeight) {
-        const toolbar = document.getElementById('toolbar');
-        const editor = document.getElementById('editor');
-        const toolbarHeight = toolbar.offsetHeight;
-        const availableHeight = window.innerHeight - toolbarHeight;
-        editor.style.height = `${availableHeight}px`;
-     
     }
 
   // function isToolbarFullyVisible() {
@@ -501,7 +344,7 @@ $('#editor').focus((e) => {
 
 
   $("#btnscrollToBottom").click(function () {
-   const $editable = $('.ql-editor');
+    const $editable = $('.ql-editor');
     const height = $editable[0].scrollHeight;
 
     console.log('scroll height: ', height);
@@ -512,11 +355,11 @@ $('#editor').focus((e) => {
   });
     
   $("#MakeUIWorkForEdit").click(function () {
-   snow.root.scrollTop = 0;
+    snow.root.scrollTop = 0;
   });
 
-   function scrollToCursor() {
-       var range = snow.getSelection();
+  function scrollToCursor() {
+      var range = snow.getSelection();
        if (range) {
          var bounds = snow.getBounds(range.index, range.length);
          snow.root.scrollTop = bounds.top;

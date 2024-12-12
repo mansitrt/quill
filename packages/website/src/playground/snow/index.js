@@ -1,3 +1,4 @@
+//import Quill from '../../../../quill/src';
 
 const toolbarOptions = [
   ['bold', 'italic', 'underline', 'strike'], // toggled buttons
@@ -16,208 +17,290 @@ const toolbarOptions = [
   [{ align: [] }],
   ['clean'], // remove formatting button
 ];
-var  placeHolderLanguage = 'Enter note content here';
-var  keyboardHeight = 0;
+
+var placeHolderLanguage = 'Enter note content here';
+var keyboardHeight = 0;
 var isTabToEdit = null;
 var isPlanNote = false;
 var belowContentHeight = 0;
+
 // Add fonts to whitelist
 let Font = Quill.import('formats/font');
 // We do not add Sans Serif since it is the default
-Font.whitelist = ['Times-New-Roman','Helvetica', 'Apple-Chancery','Papyrus','Rockwell','Optima', 'Georgia'];
+Font.whitelist = [
+  'TimesNewRoman',
+  'Helvetica',
+  'AppleChancery',
+  'Papyrus',
+  'Rockwell',
+  'Optima',
+  'Georgia',
+];
 Quill.register(Font, true);
 
-var Size = Quill.import("attributors/style/size");
-Size.whitelist = ['10px','11px', '12px', '14px', '16px', '18px', '20px', '24px','28px','36px'];
+var Size = Quill.import('attributors/style/size');
+Size.whitelist = [
+  '10px',
+  '11px',
+  '12px',
+  '14px',
+  '16px',
+  '18px',
+  '20px',
+  '24px',
+  '28px',
+  '36px',
+];
 Quill.register(Size, true);
-const quill = new Quill('#editor', {
-  modules: {
-                   table: true,
-               tableUI: true,
-      toolbar: '#toolbar'
+
+// set the default font size
+const sizeSelect = document.getElementById('sizeSelect');
+sizeSelect.value = '14px';
+
+// set the default font name
+const fontSelect = document.getElementById('fontSelect');
+fontSelect.value = 'Optima';
+
+Quill.register(
+  {
+    'modules/tableUI': quillTableUI.default,
   },
+  true,
+);
+
+var snow = new Quill('#editor', {
+  theme: 'snow',
   placeholder: `${placeHolderLanguage}`,
-  theme: 'snow', // or 'bubble'
+  modules: {
+    table: true,
+    tableUI: true,
+    toolbar: '#toolbar',
+  },
 });
 
-
-const table = quill.getModule('table');
+const table = snow.getModule('table');
+const editorContainer = document.getElementById('editor-container');
+const editor = document.getElementById('editor');
 
 document.querySelector('#insert-table').addEventListener('click', function () {
-    table.insertTable(3, 3);
+  table.insertTable(2, 2);
 });
 
 // Called each time when text changes in the editor
-const toolbar = document.getElementById("toolbar");
-const toolbarWrapper = document.getElementById("toolbarWrapper");
+const toolbar = document.getElementById('toolbar');
+const toolbarWrapper = document.getElementById('toolbarWrapper');
 
-quill.on('text-change', function (delta, source) {
-    sendContentToNativeApp()
-})
-
-// Called when user begin editing
 let editorHeight = document.getElementById('editor').offsetHeight;
-const selection =() => {
-    if (window.getSelection)
-     return window.getSelection();
+const selection = () => {
+  if (window.getSelection) return window.getSelection();
+};
+
+snow.on('selection-change', function (range) {
+  if (range) {
+    if (range.start == range.end) {
+      // window.webkit.messageHandlers.callbackHandler.postMessage(
+      //   `Toolbar_Visible`,
+      // );
+
+      if (isTabToEdit) {
+        document.getElementById('toolbar').style.display = 'block';
+      }
+    }
+  }
+});
+
+document.addEventListener('scroll', (event) => {
+  setTimeout(() => window.scrollTo(0, 0), 100);
+});
+
+function setupClickToScroll() {
+  const parentDiv = document.getElementById('editor');
+
+  if (!parentDiv) {
+    console.error(`Div with id "${divId}" not found.`);
+    return;
+  }
+
+  parentDiv.addEventListener('click', (event) => {
+    // Check if the clicked element is a child of the parent div
+    if (parentDiv.contains(event.target)) {
+      const clickedElement = event.target;
+
+      // If the clicked target is not the parent div itself
+      if (clickedElement !== parentDiv) {
+        // Set a timeout to scroll the clicked element into view after 3 seconds
+        setTimeout(() => {
+          clickedElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center', // Center the element in the view
+          });
+        }, 300); // 3 seconds delay
+      }
+    }
+  });
 }
-// quill.on('selection-change', function (range) {
-//   console.log('range :>> ', range);
-//     if (range) {
-//         if (range.start == range.end) {
-//             window.webkit.messageHandlers.callbackHandler.postMessage(`Toolbar_Visible`);
-            
-//             if(isTabToEdit) {
-//                 document.getElementById('toolbar').style.display = 'block';
-//             }
-           
-//             toolbar.scrollIntoView();
-//             setTimeout(() => {
-//                 if(document.getElementById('toolbar').style.display != 'none') {
-//                     document.getElementById('editor').style.height = `${editorHeight + Number(belowContentHeight) - Number(keyboardHeight)}px`;
-//                 }
-//                 // quill.focus();
-//                 toolbar.scrollIntoView();
-//             }, 100)
-            
-//         }
-//     }
-// })
+setupClickToScroll();
 
-// Return the HTML content of the editor
-function getQuillHtml() { return quill.root.innerHTML; }
+snow.on('text-change', function (delta, source) {
+  sendContentToNativeApp();
+});
 
-// Send editor text to native app
+function getQuillHtml() {
+  return snow.root.innerHTML;
+}
+
 function sendContentToNativeApp() {
-    try {
-        let html = getQuillHtml();
-        window.webkit.messageHandlers.callbackHandler.postMessage(html);
-    } catch (err) {
-        console.log('The native context does not exist yet');
-    }
+  try {
+    let html = getQuillHtml();
+    window.webkit.messageHandlers.callbackHandler.postMessage(html);
+  } catch (err) {
+    console.log('The native context does not exist yet');
+  }
 }
 
-function cakllkeyboardOpen() {
-    window.scrollBy({
-        top: -1
-    });
-}
-
-function isToolbarFullyVisible() {
-    var $toolbar = $('#toolbar');
-    var toolbarTop = $toolbar.offset().top;
-    var toolbarBottom = toolbarTop + $toolbar.outerHeight();
-    var windowHeight = $(window).height();
-
-    return toolbarTop >= 0 && toolbarBottom <= windowHeight;
-}
-
-$(window).on('resize', function () {
-    if (isToolbarFullyVisible) {
-        //window.webkit.messageHandlers.callbackHandler.postMessage('Toolbar_Visible');
-    } else {
-        //window.webkit.messageHandlers.callbackHandler.postMessage('Toolbar_Not_Visible');
-    }
+document.addEventListener('scroll', (event) => {
+  window.scrollTo(0, 0);
 });
 
-$("#btnscrollToBottom").click(function () {
-    const $editable = $('.ql-editor');
-    const height = $editable[0].scrollHeight;
+setupClickToScroll = () => {
+  const parentDiv = document.getElementById('editor');
 
-    console.log('scroll height: ', height);
+  if (!parentDiv) {
+    console.error(`Div with id "${divId}" not found.`);
+    return;
+  }
 
-    $editable.animate({
-        scrollTop: height
-    }, 500);
+  parentDiv.addEventListener('click', (event) => {
+    // Check if the clicked element is a child of the parent div
+    if (parentDiv.contains(event.target)) {
+      const clickedElement = event.target;
+
+      // If the clicked target is not the parent div itself
+      if (clickedElement !== parentDiv) {
+        // Set a timeout to scroll the clicked element into view after 3 seconds
+        setTimeout(() => {
+          clickedElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center', // Center the element in the view
+          });
+        }, 300); // 3 seconds delay
+      }
+    }
+  });
+};
+setupClickToScroll();
+
+function adjustForKeyboard(keyboardHeight) {
+  const editor = document.getElementById('editor');
+
+  // If keyboard is open, adjust the height of the editor
+  if (keyboardHeight > 0) {
+    editor.style.height = '200px';
+  } else {
+    editor.style.height = `calc(100vh - 80px)`;
+  }
+}
+
+// function isToolbarFullyVisible() {
+//   var $toolbar = $('#toolbar');
+//   var toolbarTop = $toolbar.offset().top;
+//   var toolbarBottom = toolbarTop + $toolbar.outerHeight();
+//   var windowHeight = $(window).height();
+//   return toolbarTop >= 0 && toolbarBottom <= windowHeight;
+// }
+
+// $(window).on('resize', function () {
+//   if (isToolbarFullyVisible) {
+//     // window.webkit.messageHandlers.callbackHandler.postMessage('Toolbar_Visible');
+//   } else {
+//     // window.webkit.messageHandlers.callbackHandler.postMessage('Toolbar_Not_Visible');
+//   }
+// });
+
+$('#btnscrollToBottom').click(function () {
+  const $editable = $('.ql-editor');
+  const height = $editable[0].scrollHeight;
+
+  console.log('scroll height: ', height);
+
+  $editable.animate(
+    {
+      scrollTop: height,
+    },
+    500,
+  );
 });
 
-$("#MakeUIWorkForEdit").click(function () {
-    quill.root.scrollTop = 0;
+$('#MakeUIWorkForEdit').click(function () {
+  snow.root.scrollTop = 0;
 });
 
 function scrollToCursor() {
-    var range = quill.getSelection();
-    if (range) {
-        var bounds = quill.getBounds(range.index, range.length);
-        quill.root.scrollTop = bounds.top;
-    }
+  var range = snow.getSelection();
+  if (range) {
+    var bounds = snow.getBounds(range.index, range.length);
+    snow.root.scrollTop = bounds.top;
+  }
 }
 
-$("#ScrollToCursorPosition").click(function () {
-    scrollToCursor();
+$('#ScrollToCursorPosition').click(function () {
+  scrollToCursor();
 });
 
-function getTextOfRichTextEditorSave() {
-    quill.root.blur();
-    quill.enable(false);
-    return quill.root.innerHTML;
-}
+// function getTextOfRichTextEditorSave() {
+//   snow.root.blur();
+//   snow.enable(false);
+//   return snow.root.innerHTML;
+// }
 
 function disabledRichTextContainer() {
-    quill.enable(false);
-    isTabToEdit = false;
+  snow.enable(false);
+  isTabToEdit = false;
 
-    document.getElementById('toolbar').style.display = 'none';
-    document.querySelector('#editor-container .ql-container.ql-snow').style.height = '100%';
-
+  document.getElementById('toolbar').style.display = 'none';
+  document.querySelector(
+    '#editor-container .ql-container.ql-snow',
+  ).style.height = '100%';
 }
-
 
 function enabledRichTextContainer() {
-    isPlanNote = false;
-    quill.enable(true);
-    document.getElementById('toolbar').style.display = 'none';
-    isTabToEdit = true;
-    document.querySelector('#editor-container .ql-container.ql-snow').style.height = '95%';
+  isPlanNote = false;
+  snow.enable(true);
+  document.getElementById('toolbar').style.display = 'none';
+  isTabToEdit = true;
+  document.querySelector(
+    '#editor-container .ql-container.ql-snow',
+  ).style.height = '95%';
 }
 
-function getTextOfRichTextEditorEdit() {
-    //window.webkit.messageHandlers.callbackHandler.postMessage('Start edit');
-    quill.enable(true);
-    const root = quill.root;
-    const selectionPosition = Math.round(root.scrollTop / (root.scrollHeight - root.clientHeight) * quill.getLength());
-    quill.setSelection(selectionPosition || 0);
-    document.getElementById('toolbar').style.display = 'block';
+// function getTextOfRichTextEditorEdit() {
+//   snow.enable(true);
+//   const root = snow.root;
+//   const selectionPosition = Math.round(root.scrollTop / (root.scrollHeight - root.clientHeight) * snow.getLength());
+//   snow.setSelection(selectionPosition || 0);
+//   document.getElementById('toolbar').style.display = 'block';
 
-    
-    setTimeout(() => {
-        if(document.getElementById('toolbar').style.display != 'none') {
-            document.getElementById('editor').style.height = `${editorHeight + Number(belowContentHeight) - Number(keyboardHeight)}px`;
-        }
-        quill.focus();
-        toolbar.scrollIntoView();
-    }, 100)
-}
-       
- async function setkeyboardScroll() {
-     const range = quill.getSelection();
-     await quill.blur();
-     await quill.setSelection(range.index, range.length);
-     await toolbar.scrollIntoView();
- }
+//   setTimeout(() => {
+//     if(document.getElementById('toolbar').style.display != 'none') {
+//       document.getElementById('editor').style.height = `${editorHeight + Number(belowContentHeight) - Number(keyboardHeight)}px`;
+//     }
+//     snow.focus();
+//     toolbar.scrollIntoView();
+//   }, 100)
+// }
 
-// START: set default font size
- function onSelectDefaultFontSize(size) {
-     //document.getElementById("sizeSelect").value = size;
-     //snow.format("size", size);
-     //const option = document.querySelector("#sizeSelect .ql-picker-label");
-     //option.setAttribute("data-value", size);
-     //option.setAttribute("data-label", size);
-     //document.getElementById("firstElement")?.setAttribute('style',`font-size:${size}`);
- }
- // END: set default font size
-       
- // START: set default font family
- function onSelectDefaultFontFamily(font) {
-    // document.getElementById("fontSelect").value = font.replaceAll(" ","-");
-    // snow.format("font", font.replaceAll(" ","-"));
-     //const option = document.querySelector("#fontSelect .ql-picker-label");
-     //option.setAttribute("data-value", font.replaceAll(" ","-"));
-    // option.setAttribute("data-label", font);
-    // document.getElementById("firstElement")?.classList?.add(`ql-font-${font.replaceAll(" ","-")}`);
- }
-// END: set default font family
+// async function setkeyboardScroll() {
+//   const range = snow.getSelection();
+//   await snow.blur();
+//   await snow.setSelection(range.index, range.length);
+//   await toolbar.scrollIntoView();
+// }
+
+// Call this function when the font and size values are received from Swift
+// function setDefaults(fontName, fontSize) {
+//   initializeEditor(fontName, fontSize);
+// }
 
 function changeThePlaceHolder(newPlaceholder) {
-    quill.root.setAttribute('data-placeholder', `${newPlaceholder}`);
+  snow.root.setAttribute('data-placeholder', `${newPlaceholder}`);
 }
